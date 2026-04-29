@@ -1,0 +1,5 @@
+node_modules/
+.env
+
+# Claude Code — local settings contain user-specific overrides
+.claude/settings.local.json

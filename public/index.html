@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Retro Rotation — Control Panel</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="control">
+    <div class="control-wrap">
+      <h1>🎮 Retro Rotation</h1>
+
+      <div id="now-playing" aria-live="polite">
+        <div class="np-main">
+          <img id="np-thumb" src="" alt="" />
+          <div class="np-info">
+            <div class="np-label">Now Playing</div>
+            <div class="np-name text-truncate" id="np-name"></div>
+            <div class="np-platform" id="np-platform"></div>
+          </div>
+        </div>
+        <div class="np-console-row">
+          <select id="console-override" class="field">
+            <option value="">(auto)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <input
+          id="search-input"
+          type="search"
+          class="field"
+          placeholder="Search for a game… (e.g. Zelda NES)"
+          autocomplete="off"
+          autofocus
+        />
+        <button id="search-btn">Search</button>
+      </div>
+      <div class="search-row id-row">
+        <input
+          id="id-input"
+          type="number"
+          class="field"
+          placeholder="IGDB game ID…"
+          autocomplete="off"
+          min="1"
+        />
+        <button id="id-btn">Load by ID</button>
+      </div>
+
+      <ul id="results" role="listbox" aria-label="Search results"></ul>
+      <div id="status"></div>
+    </div>
+
+    <script src="control.js"></script>
+  </body>
+</html>

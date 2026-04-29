@@ -1,0 +1,299 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --accent: #e8b84b;
+  --bg: #111318;
+  --surface: #1c1f26;
+  --surface-hover: #22262f;
+  --border: #2a2d36;
+  --text: #e0e2e8;
+  --muted: #666c7e;
+  --radius: 8px;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Control panel ─────────────────────────────────────────── */
+
+body.control {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+.control-wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+.control-wrap h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+/* Shared base for text inputs and selects */
+.field {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field:focus {
+  border-color: var(--accent);
+}
+
+.search-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.search-row input {
+  flex: 1;
+  font-size: 15px;
+  padding: 10px 14px;
+}
+.search-row input::placeholder {
+  color: var(--muted);
+}
+
+.search-row button {
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #111;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  transition: opacity 0.15s;
+}
+.search-row button:hover {
+  opacity: 0.85;
+}
+
+.id-row {
+  margin-bottom: 16px;
+}
+.id-row input {
+  -moz-appearance: textfield;
+}
+.id-row input::-webkit-outer-spin-button,
+.id-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.id-row button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+}
+.id-row button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  opacity: 1;
+}
+
+/* Now-playing banner */
+#now-playing {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+}
+#now-playing.visible {
+  display: flex;
+}
+.np-main {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+#now-playing img {
+  border-radius: 4px;
+  height: 48px;
+  object-fit: cover;
+  width: 36px;
+}
+#now-playing .np-info {
+  flex: 1;
+  overflow: hidden;
+}
+#now-playing .np-label {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+#now-playing .np-name {
+  font-weight: 600;
+}
+#now-playing .np-platform {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.np-console-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+.np-console-row label {
+  color: var(--muted);
+  flex-shrink: 0;
+  font-size: 12px;
+}
+.np-console-row select {
+  cursor: pointer;
+  flex: 1;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Results list */
+#results {
+  list-style: none;
+}
+#results li {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 6px;
+  padding: 10px 14px;
+  transition:
+    border-color 0.12s,
+    background 0.12s;
+}
+#results li:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+}
+#results li.active {
+  border-color: var(--accent);
+}
+#results li img {
+  border-radius: 4px;
+  height: 56px;
+  object-fit: cover;
+  width: 42px;
+}
+#results li .result-info {
+  flex: 1;
+  overflow: hidden;
+}
+#results li .result-name {
+  font-weight: 600;
+}
+#results li .result-platform {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+#load-more-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  cursor: pointer;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 10px;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+  width: 100%;
+}
+#load-more-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#status {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ── Display page (OBS source) ────────────────────────────── */
+
+body.display {
+  background: transparent;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  width: 100vw;
+}
+
+/* Game box art — sits upper-right, slight perspective tilt */
+.cover-art {
+  filter: drop-shadow(-12px 16px 24px rgba(0, 0, 0, 0.75));
+  height: 68%;
+  opacity: 0;
+  position: absolute;
+  right: 12%;
+  top: 4%;
+  transform: perspective(900px) rotateY(-10deg) rotateX(2deg);
+  transition: opacity 0.5s ease;
+  width: auto;
+}
+.cover-art.visible {
+  opacity: 1;
+}
+
+/* Console image — foreground, lower-left, overlaps box art bottom */
+.console-img {
+  bottom: 4%;
+  filter: drop-shadow(10px 12px 28px rgba(0, 0, 0, 0.85));
+  left: 4%;
+  opacity: 0;
+  position: absolute;
+  transform: perspective(900px) rotateY(4deg);
+  transition: opacity 0.3s ease;
+  width: 62%;
+}
+.console-img.visible {
+  opacity: 1;
+}
+
+.no-game {
+  align-items: center;
+  color: rgba(255, 255, 255, 0.15);
+  display: flex;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  height: 100%;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
