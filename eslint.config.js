@@ -14,6 +14,13 @@ module.exports = [
     },
   },
   {
+    files: ['src/tests/**/*.js', '**/*.test.js', '**/*.spec.js'],
+    languageOptions: {
+      globals: { ...globals.node, ...globals.jest },
+      sourceType: 'commonjs',
+    },
+  },
+  {
     files: ['public/**/*.js'],
     languageOptions: {
       globals: globals.browser,
