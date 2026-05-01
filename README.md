@@ -8,7 +8,7 @@ Control Panel
 
 OBS Display  
 
-![Retro Rotation OBS Display](media/obs_screenshot.png)
+![Retro Rotation OBS Scene](media/scene.gif)
 
 ---
 
