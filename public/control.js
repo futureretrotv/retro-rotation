@@ -9,6 +9,9 @@ const npThumb = document.getElementById('np-thumb');
 const npName = document.getElementById('np-name');
 const npPlatform = document.getElementById('np-platform');
 const consoleOverride = document.getElementById('console-override');
+const saveBtn = document.getElementById('save-btn');
+const savedSection = document.getElementById('saved-section');
+const savedList = document.getElementById('saved-list');
 
 let debounceTimer = null;
 let activeGameId = null;
@@ -44,6 +47,11 @@ function renderNowPlaying(game) {
   npPlatform.textContent = game.platform || '';
   consoleOverride.value = game.consoleName || '';
   nowPlaying.classList.add('visible');
+  savedList
+    .querySelectorAll('li')
+    .forEach((el) =>
+      el.classList.toggle('active', Number(el.dataset.id) === game.id),
+    );
 }
 
 function buildCard(game) {
@@ -95,6 +103,88 @@ consoleOverride.addEventListener('change', async () => {
     currentGame = updated;
   } catch (err) {
     setStatus(`Failed to update console: ${err.message}`);
+  }
+});
+
+// ── Saved games ────────────────────────────────────────────
+
+let savedGames = [];
+
+function renderSavedList() {
+  savedList.innerHTML = '';
+  if (!savedGames.length) {
+    savedSection.classList.add('hidden');
+    return;
+  }
+  savedSection.classList.remove('hidden');
+  savedGames.forEach((game) => savedList.appendChild(buildSavedCard(game)));
+}
+
+function buildSavedCard(game) {
+  const li = document.createElement('li');
+  li.dataset.id = game.id;
+  if (game.id === activeGameId) li.classList.add('active');
+
+  li.innerHTML =
+    '<img alt=""><div class="result-info"><div class="result-name text-truncate"></div><div class="result-platform"></div></div><button class="delete-btn" aria-label="Remove">×</button>';
+
+  const img = li.querySelector('img');
+  if (game.coverThumb) {
+    img.src = game.coverThumb;
+    img.alt = game.name;
+  } else {
+    img.style.display = 'none';
+  }
+  li.querySelector('.result-name').textContent = game.name;
+  li.querySelector('.result-platform').textContent =
+    game.consoleName || game.platform || 'Unknown platform';
+
+  li.addEventListener('click', (e) => {
+    if (e.target.closest('.delete-btn')) return;
+    selectGame(game, li);
+  });
+
+  li.querySelector('.delete-btn').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch(`/api/saved/${game.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      savedGames = savedGames.filter((g) => g.id !== game.id);
+      renderSavedList();
+    } catch (err) {
+      setStatus(`Failed to remove: ${err.message}`);
+    }
+  });
+
+  return li;
+}
+
+saveBtn.addEventListener('click', async () => {
+  if (!currentGame) return;
+  try {
+    saveBtn.disabled = true;
+    const res = await fetch('/api/saved', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentGame),
+    });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    const saved = await res.json();
+    const idx = savedGames.findIndex((g) => g.id === saved.id);
+    if (idx >= 0) {
+      savedGames[idx] = saved;
+    } else {
+      savedGames.unshift(saved);
+    }
+    renderSavedList();
+    saveBtn.textContent = 'Saved!';
+    setTimeout(() => {
+      saveBtn.textContent = 'Save';
+    }, 1500);
+  } catch (err) {
+    setStatus(`Failed to save: ${err.message}`);
+  } finally {
+    saveBtn.disabled = false;
   }
 });
 
@@ -205,9 +295,10 @@ idBtn.addEventListener('click', doLoadById);
 
 (async () => {
   try {
-    const [currentRes, consolesRes] = await Promise.all([
+    const [currentRes, consolesRes, savedRes] = await Promise.all([
       fetch('/api/current'),
       fetch('/api/consoles'),
+      fetch('/api/saved'),
     ]);
 
     const game = await currentRes.json();
@@ -220,6 +311,9 @@ idBtn.addEventListener('click', doLoadById);
       opt.textContent = label;
       consoleOverride.appendChild(opt);
     }
+
+    savedGames = await savedRes.json();
+    renderSavedList();
   } catch {
     // Non-fatal
   }

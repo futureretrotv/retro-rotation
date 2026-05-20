@@ -8,6 +8,7 @@ const {
   setCurrentGame,
   getCurrentGame,
 } = require('./sse');
+const { getSavedGames, saveGame, removeSavedGame } = require('./savedGames');
 
 const router = Router();
 const PUBLIC = path.join(__dirname, '..', 'public');
@@ -72,6 +73,26 @@ router.get('/api/current', (_req, res) => {
 
 router.post('/api/current', (req, res) => {
   setCurrentGame(req.body ?? null);
+  res.json({ ok: true });
+});
+
+// API — saved games (persisted to disk)
+router.get('/api/saved', (_req, res) => {
+  res.json(getSavedGames());
+});
+
+router.post('/api/saved', (req, res) => {
+  if (!req.body || !req.body.id)
+    return res.status(400).json({ error: 'Missing game data' });
+  const entry = saveGame(req.body);
+  res.json(entry);
+});
+
+router.delete('/api/saved/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isFinite(id) || id <= 0)
+    return res.status(400).json({ error: 'Invalid ID' });
+  removeSavedGame(id);
   res.json({ ok: true });
 });
 

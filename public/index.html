@@ -23,7 +23,13 @@
           <select id="console-override" class="field">
             <option value="">(auto)</option>
           </select>
+          <button id="save-btn">Save</button>
         </div>
+      </div>
+
+      <div id="saved-section" class="hidden">
+        <div class="saved-header">Saved Games</div>
+        <ul id="saved-list" role="listbox" aria-label="Saved games"></ul>
       </div>
 
       <div class="search-row">
@@ -38,14 +44,7 @@
         <button id="search-btn">Search</button>
       </div>
       <div class="search-row id-row">
-        <input
-          id="id-input"
-          type="number"
-          class="field"
-          placeholder="IGDB game ID…"
-          autocomplete="off"
-          min="1"
-        />
+        <input id="id-input" type="number" class="field" placeholder="IGDB game ID…" autocomplete="off" min="1" />
         <button id="id-btn">Load by ID</button>
       </div>
 
