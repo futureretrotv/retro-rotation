@@ -16,7 +16,6 @@ OBS Display
 
 - [Node.js](https://nodejs.org/) 18 or later
 - A [Twitch Developer](https://dev.twitch.tv/console) account (used to authenticate against the IGDB API)
-- _(Optional)_ A [ClickUp](https://clickup.com) account for time tracking
 
 ## Setup
 
@@ -50,15 +49,6 @@ OBS Display
    4. Set the Category to **Other**.
    5. Copy the generated **Client ID** and create a **New Secret**.
 
-   _(Optional)_ To enable ClickUp time tracking, also add:
-
-   ```
-   CLICKUP_API_TOKEN=your_personal_api_token
-   CLICKUP_LIST_ID=your_list_id
-   ```
-
-   Your personal API token is under **ClickUp Settings → Apps**. The list ID is the numeric ID in the URL when you open a list in ClickUp.
-
 3. **Start the server**
 
    ```bash
@@ -89,10 +79,9 @@ Open the control panel at `http://localhost:3000` in any browser.
 - **Select** a game to set it as "now playing". The OBS overlay updates immediately.
 - **Override the console** using the dropdown if the auto-detected platform is wrong or if you want to display a different console image.
 - **Save** the current game to your saved list. Saved games are written to `data/saved-games.json` and survive server restarts. Click any saved game to set it as "now playing" again, or click **×** to remove it from the list.
-- **Track** time with ClickUp (requires `CLICKUP_API_TOKEN` and `CLICKUP_LIST_ID` in `.env`). Click **Track** to start a session and **Stop** to end it — the elapsed time is logged to a ClickUp task named after the game. The task is created automatically on first use and cached locally in `data/clickup-tasks.json`.
 - **Clear** the current game to hide the overlay.
 
-"Now playing" state is held in memory and resets on server restart. Saved games and the ClickUp task cache persist to the `data/` directory.
+"Now playing" state is held in memory and resets on server restart. Saved games persist to the `data/` directory.
 
 ---
 
@@ -130,10 +119,6 @@ IGDB uses Twitch's OAuth layer. A token is fetched on first search, cached in me
 ### Saved games (`src/savedGames.js`)
 
 Games can be saved to `data/saved-games.json` so they survive server restarts. Saving a game that already exists in the list updates it in place (preserving list order); new games are prepended. The `data/` directory is created automatically on first write.
-
-### ClickUp time tracking (`src/clickup.js`)
-
-When `CLICKUP_API_TOKEN` and `CLICKUP_LIST_ID` are set, the Track button appears in the control panel. Starting a session records the current timestamp in memory; stopping it computes the duration and POSTs a time entry to the ClickUp API. The ClickUp task ID for each IGDB game is cached in `data/clickup-tasks.json` so the task is only created once per game.
 
 ---
 

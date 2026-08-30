@@ -193,67 +193,6 @@ saveBtn.addEventListener('click', async () => {
   }
 });
 
-// ── ClickUp tracking ────────────────────────────────────────
-
-function formatElapsed(ms) {
-  const s = Math.floor(ms / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-}
-
-function setTracking(tracking, startedAt = null) {
-  isTracking = tracking;
-  trackBtn.textContent = tracking ? 'Stop' : 'Track';
-  trackBtn.classList.toggle('tracking', tracking);
-  clearInterval(trackInterval);
-  if (tracking && startedAt) {
-    trackInterval = setInterval(() => {
-      trackTimer.textContent = formatElapsed(Date.now() - startedAt);
-    }, 1000);
-    trackTimer.textContent = formatElapsed(Date.now() - startedAt);
-  } else {
-    trackTimer.textContent = '0:00:00';
-  }
-}
-
-trackBtn.addEventListener('click', async () => {
-  trackBtn.disabled = true;
-  try {
-    if (!isTracking) {
-      const res = await fetch('/api/clickup/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentGame),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setStatus(`ClickUp: ${data.error || res.status}`);
-        return;
-      }
-      setTracking(true, Date.now());
-    } else {
-      const res = await fetch('/api/clickup/stop', { method: 'POST' });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setStatus(`ClickUp: ${data.error || res.status}`);
-        return;
-      }
-      const data = await res.json();
-      setTracking(false);
-      if (data.logged) {
-        setStatus(`Logged ${formatElapsed(data.durationMs)} to ClickUp.`);
-        setTimeout(() => setStatus(''), 4000);
-      }
-    }
-  } catch (err) {
-    setStatus(`ClickUp: ${err.message}`);
-  } finally {
-    trackBtn.disabled = false;
-  }
-});
-
 // ── Search ─────────────────────────────────────────────────
 
 function removeLoadMoreBtn() {
@@ -361,11 +300,10 @@ idBtn.addEventListener('click', doLoadById);
 
 (async () => {
   try {
-    const [currentRes, consolesRes, savedRes, clickupRes] = await Promise.all([
+    const [currentRes, consolesRes, savedRes] = await Promise.all([
       fetch('/api/current'),
       fetch('/api/consoles'),
       fetch('/api/saved'),
-      fetch('/api/clickup/status'),
     ]);
 
     const game = await currentRes.json();
@@ -381,12 +319,6 @@ idBtn.addEventListener('click', doLoadById);
 
     savedGames = await savedRes.json();
     renderSavedList();
-
-    const cuStatus = await clickupRes.json();
-    if (cuStatus.enabled) {
-      trackRow.classList.remove('hidden');
-      if (cuStatus.tracking) setTracking(true, cuStatus.startedAt);
-    }
   } catch {
     // Non-fatal
   }

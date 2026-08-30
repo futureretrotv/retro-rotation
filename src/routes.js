@@ -9,7 +9,6 @@ const {
   getCurrentGame,
 } = require('./sse');
 const { getSavedGames, saveGame, removeSavedGame } = require('./savedGames');
-const { findOrCreateTask, logTime, isConfigured } = require('./clickup');
 
 const router = Router();
 const PUBLIC = path.join(__dirname, '..', 'public');
@@ -97,47 +96,6 @@ router.delete('/api/saved/:id', (req, res) => {
     return res.status(400).json({ error: 'Invalid ID' });
   removeSavedGame(id);
   res.json({ ok: true });
-});
-
-// API — ClickUp time tracking
-router.get('/api/clickup/status', (_req, res) => {
-  res.json({
-    enabled: isConfigured(),
-    tracking: !!trackingSession,
-    gameName: trackingSession?.gameName ?? null,
-    startedAt: trackingSession?.startedAt ?? null,
-  });
-});
-
-router.post('/api/clickup/start', (req, res) => {
-  const game = req.body;
-  if (!game?.id || !game?.name)
-    return res.status(400).json({ error: 'Missing game data' });
-  if (!isConfigured())
-    return res.status(503).json({ error: 'ClickUp not configured' });
-
-  trackingSession = { gameId: game.id, gameName: game.name, startedAt: Date.now() };
-  res.json({ ok: true });
-});
-
-router.post('/api/clickup/stop', async (_req, res) => {
-  if (!trackingSession)
-    return res.status(400).json({ error: 'No active session' });
-
-  const { gameId, gameName, startedAt } = trackingSession;
-  trackingSession = null;
-
-  const durationMs = Date.now() - startedAt;
-  if (durationMs < 1000) return res.json({ ok: true, logged: false });
-
-  try {
-    const taskId = await findOrCreateTask(gameId, gameName);
-    await logTime(taskId, startedAt, durationMs);
-    res.json({ ok: true, logged: true, durationMs });
-  } catch (err) {
-    console.error('ClickUp log error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
 });
 
 // SSE — real-time push to display page
